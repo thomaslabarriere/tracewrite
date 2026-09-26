@@ -1,0 +1,27 @@
+// TraceWrite data model.
+//
+// Biolevate's stack is PostgreSQL via Prisma. This schema is provider-agnostic
+// at the model level; the demo runs on a local SQLite file (`dev.db`) so it
+// works with no external database. To point at PostgreSQL, change `provider`
+// to "postgresql" and set DATABASE_URL to a Postgres connection string — no
+// model changes required.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// A synthetic source document (short scientific abstract). SYNTHETIC / DEMO ONLY.
+model Source {
+  id        String   @id
+  title     String
+  authors   String
+  year      Int
+  specialty String // "oncology" | "dermatology"
+  body      String // the abstract text; verification matches spans within this
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,46 @@
+{
+  "name": "tracewrite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-assisted scientific-writing editor with per-claim provenance and a groundedness verification table.",
+  "scripts": {
+    "predev": "node prisma/ensure-db.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate && node prisma/ensure-db.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "@tanstack/react-table": "8.20.5",
+    "@tanstack/react-virtual": "3.10.9",
+    "@tiptap/pm": "^2.27.3",
+    "@tiptap/react": "^2.27.3",
+    "@tiptap/starter-kit": "^2.27.3",
+    "next": "^14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.48.2",
+    "@types/node": "20.16.11",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.0",
+    "prisma": "5.22.0",
+    "tsx": "4.19.1",
+    "typescript": "5.6.3",
+    "vitest": "2.1.4"
+  },
+  "optionalDependencies": {
+    "openai": "4.68.4"
+  }
+}
