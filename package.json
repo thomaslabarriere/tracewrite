@@ -4,14 +4,14 @@
   "private": true,
   "description": "AI-assisted scientific-writing editor with per-claim provenance and a groundedness verification table.",
   "scripts": {
-    "predev": "node prisma/ensure-db.mjs",
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "prisma generate && (prisma db push --skip-generate --accept-data-loss && tsx prisma/seed.ts || echo '[tracewrite] database seed skipped; serving in-memory synthetic sources') && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push --skip-generate",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate && node prisma/ensure-db.mjs",
+    "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"

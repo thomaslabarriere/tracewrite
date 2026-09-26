@@ -11,13 +11,13 @@ function toSpecialty(value: string): Specialty {
     : "oncology";
 }
 
-// Reads sources from Prisma/SQLite when available, and falls back to the
-// in-memory synthetic constant if the DB isn't reachable (e.g. a sandbox with
-// no filesystem write access). Either way the app runs offline.
+// Reads sources from the database via Prisma when one is reachable and seeded
+// (PostgreSQL/Neon in production, or a local SQLite file), and falls back to the
+// in-memory synthetic constant otherwise. Either way the app runs with no setup.
 
 export async function loadSources(): Promise<{
   sources: Source[];
-  origin: "sqlite" | "memory";
+  origin: "database" | "memory";
 }> {
   try {
     const { PrismaClient } = await import("@prisma/client");
@@ -33,7 +33,7 @@ export async function loadSources(): Promise<{
         specialty: toSpecialty(r.specialty),
         body: r.body,
       }));
-      return { sources, origin: "sqlite" };
+      return { sources, origin: "database" };
     }
   } catch {
     // fall through to memory

@@ -18,7 +18,7 @@ async function main() {
     });
   }
   const count = await prisma.source.count();
-  console.log(`Seeded ${count} synthetic sources into dev.db (DEMO DATA).`);
+  console.log(`Seeded ${count} synthetic sources into the database (DEMO DATA).`);
 }
 
 main()

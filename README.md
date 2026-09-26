@@ -2,6 +2,8 @@
 
 AI-assisted scientific-writing editor with **provenance for every claim**.
 
+**Live demo:** https://tracewrite.vercel.app
+
 > **Engineering thesis:** AI-assisted scientific writing is only useful if a
 > professional can verify where each generated claim came from. In TraceWrite,
 > every generated claim carries provenance to its source evidence; claims not
@@ -53,13 +55,13 @@ src/core/            ← pure, framework-free verification core (unit-tested)
   sources.ts         10 synthetic abstracts (also used to seed the DB)
 
 src/lib/
-  sources-store.ts   loads sources from Prisma/SQLite, falls back to in-memory
+  sources-store.ts   loads sources from the database via Prisma, falls back to in-memory
   llm.ts             OPTIONAL live path (OpenAI), isolated & gated
 
 src/app/api/*        Node route handlers: /sources, /draft, /verify
 src/app/, components/ Next.js App Router UI (editor, sources panel, table)
 
-prisma/              schema + seed + auto-init (dev.db, SQLite)
+prisma/              schema + seed (PostgreSQL/Neon in production)
 e2e/                 Playwright smoke test
 ```
 
@@ -67,12 +69,13 @@ e2e/                 Playwright smoke test
   **TipTap**. The verification table uses **TanStack Table** with
   **TanStack Virtual** row virtualization.
 - **API:** Node route handlers under `src/app/api`.
-- **Data:** **Prisma**. Biolevate's stack is PostgreSQL; the schema is
-  provider-agnostic and the demo runs on a local **SQLite** file (`dev.db`),
-  seeded automatically, so it needs no external database. Switch to Postgres by
-  changing `provider` in `prisma/schema.prisma` and `DATABASE_URL` (no model
-  changes). If the DB is unreachable, the app transparently falls back to the
-  in-memory synthetic sources.
+- **Data:** **Prisma** on **PostgreSQL (Neon)** in production (Biolevate's
+  stack). The model layer uses only `String`/`Int`/`DateTime`, so it is
+  provider-agnostic. On Vercel the build pushes the schema to Neon and seeds the
+  synthetic sources; at runtime the app reads them from Postgres. If no database
+  is reachable or seeded (for example a fresh local clone with no `DATABASE_URL`),
+  the app transparently falls back to the in-memory synthetic sources, so it
+  always runs with zero setup.
 - **Verification core is deliberately separated from the UI** and imports no
   React/Next/Prisma. That is what makes it exhaustively unit-testable and what
   would let it run identically in a batch pipeline or a server job.
@@ -101,12 +104,15 @@ e2e/                 Playwright smoke test
 ## Run it
 
 ```bash
-npm install       # also generates the Prisma client and seeds dev.db
-npm run dev       # http://localhost:3000  (no API key, no external DB needed)
+npm install       # installs deps and generates the Prisma client
+npm run dev       # http://localhost:3000  (no API key, no database needed)
 ```
 
-`npm install` seeds a local SQLite `dev.db` with the synthetic sources. `predev`
-re-checks it on every `npm run dev`, so a fresh clone just runs.
+A fresh local clone runs with no configuration: with no `DATABASE_URL`, the app
+serves the synthetic sources from memory. To run it against a real database
+locally, set `DATABASE_URL` to a Postgres string and run `npm run db:push` then
+`npm run db:seed`. In production on Vercel this happens automatically at build
+time against Neon (see `vercel-build`).
 
 **Optional live path.** Copy `.env.example` to `.env` and set `OPENAI_API_KEY`
 (and optionally `OPENAI_MODEL`). The API routes then accept `{ "live": true }`
@@ -157,7 +163,7 @@ with every source's score and numeric-match flag.
 
 ## Tech
 
-Next.js 14.2 · React 18 · TypeScript 5.6 · Prisma 5 (SQLite) · TanStack
+Next.js 14.2 · React 18 · TypeScript 5.6 · Prisma 5 (PostgreSQL/Neon) · TanStack
 Table + Virtual · TipTap · Vitest · Playwright.
 
 > Note: `npm audit` reports advisories against Next 14.2.x that are only fixed
