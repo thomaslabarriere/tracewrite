@@ -26,7 +26,7 @@ export default function SummaryHeader({ report }: { report: VerificationReport |
         <b>{unsupported}</b> unsupported
       </span>
       <span className="trace">
-        engine: {report.engine} · checked {report.checkedSourceIds.length} sources
+        checked against {report.checkedSourceIds.length} sources · {report.engine} verifier
       </span>
     </div>
   );

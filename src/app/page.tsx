@@ -12,7 +12,6 @@ const INITIAL = `<p>Adjuvant zolgetinib reduced the risk of recurrence in resect
 
 export default function Home() {
   const [sources, setSources] = useState<Source[]>([]);
-  const [origin, setOrigin] = useState<string>("");
   const [text, setText] = useState("");
   const [report, setReport] = useState<VerificationReport | null>(null);
   const [activeEvidence, setActiveEvidence] = useState<EvidenceSpan | null>(null);
@@ -26,7 +25,6 @@ export default function Home() {
       .then((r) => r.json())
       .then((d) => {
         setSources(d.sources);
-        setOrigin(d.origin);
       })
       .catch(() => {});
   }, []);
@@ -90,8 +88,7 @@ export default function Home() {
       <header className="app-header">
         <h1>TraceWrite</h1>
         <span className="sub">
-          grounded scientific writing · provenance for every claim · sources
-          from {origin || "…"}
+          grounded scientific writing · provenance for every claim
         </span>
       </header>
 
@@ -116,7 +113,8 @@ export default function Home() {
               {drafting ? "Drafting…" : "Draft from sources"}
             </button>
             <span className="trace">
-              Offline deterministic verifier. Edit the draft, then verify.
+              How it works: 1) edit the draft, or use "Draft from sources"; 2) "Verify
+              draft" checks every claim against the sources and flags anything not supported.
             </span>
           </div>
 
@@ -163,7 +161,7 @@ export default function Home() {
 
           {report && (
             <details className="trace-panel">
-              <summary>Run trace (deterministic)</summary>
+              <summary>How each claim was checked</summary>
               <div className="trace">
                 Ran at {report.ranAt}. Each claim was scored against all{" "}
                 {report.checkedSourceIds.length} sources (
